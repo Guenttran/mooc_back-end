@@ -20,6 +20,9 @@ public class InterviewSchedule extends BaseEntity {
     @Column(name = "schedule_id")
     private Long scheduleId;
 
+    @Column(name = "schedule_title")
+    private String scheduleTitle;
+
     private LocalDate date;
 
     @Column(name = "start_time")
