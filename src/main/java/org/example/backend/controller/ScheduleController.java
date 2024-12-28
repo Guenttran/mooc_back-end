@@ -1,23 +1,29 @@
 package org.example.backend.controller;
 
+import lombok.AllArgsConstructor;
+import org.example.backend.dto.job.JobInterviewDTO;
 import org.example.backend.dto.schedule.InterviewScheduleDTO;
+import org.example.backend.service.job.JobServiceImpl;
 import org.example.backend.service.schedule.ScheduleServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/schedules")
 @CrossOrigin("*")
+@AllArgsConstructor
 public class ScheduleController {
     private final ScheduleServiceImpl scheduleService;
-
-    public ScheduleController(ScheduleServiceImpl scheduleService) {
-        this.scheduleService = scheduleService;
-    }
+    private final JobServiceImpl jobService;
 
     @GetMapping
     public Page<InterviewScheduleDTO> getAllSchedules(
@@ -35,18 +41,44 @@ public class ScheduleController {
         return ResponseEntity.ok(schedule);
     }
 
+    @GetMapping("/schedules/form-data")
+    public ResponseEntity<Map<String, Object>> getAddFormData() {
+        List<JobInterviewDTO> jobs = jobService.getAllOpenJobs();
+        Map<String, Object> response = new HashMap<>();
+        response.put("jobs", jobs);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping
-    public ResponseEntity<InterviewScheduleDTO> createSchedule(@RequestBody InterviewScheduleDTO scheduleDTO) {
-        InterviewScheduleDTO createdSchedule = scheduleService.createSchedule(scheduleDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdSchedule);
+    public ResponseEntity<?> addSchedule(@Validated @RequestBody InterviewScheduleDTO scheduleDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        scheduleService.createSchedule(scheduleDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/schedules/{id}/form-data")
+    public ResponseEntity<Map<String, Object>> getUpdateFormData(@PathVariable Long id) {
+        InterviewScheduleDTO scheduleDTO = scheduleService.getScheduleById(id);
+        List<JobInterviewDTO> jobs = jobService.getAllOpenJobs();
+        Map<String, Object> response = new HashMap<>();
+        response.put("schedule", scheduleDTO);
+        response.put("jobs", jobs);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<InterviewScheduleDTO> updateSchedule(
+    public ResponseEntity<?> updateSchedule(
             @PathVariable Long id,
-            @RequestBody InterviewScheduleDTO scheduleDTO) {
-        InterviewScheduleDTO updatedSchedule = scheduleService.updateSchedule(id, scheduleDTO);
-        return ResponseEntity.ok(updatedSchedule);
+            @Validated @RequestBody InterviewScheduleDTO scheduleDTO,
+            BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        scheduleService.getScheduleById(id);
+        scheduleService.updateSchedule(id, scheduleDTO);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

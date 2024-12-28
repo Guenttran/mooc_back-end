@@ -9,7 +9,7 @@ public interface ScheduleService {
     Page<InterviewScheduleDTO> getAllSchedules(Pageable pageable, String search);
 
     InterviewScheduleDTO getScheduleById(Long id);
-    InterviewScheduleDTO createSchedule(InterviewScheduleDTO scheduleDTO);
-    InterviewScheduleDTO updateSchedule(Long id, InterviewScheduleDTO scheduleDTO);
+    void createSchedule(InterviewScheduleDTO scheduleDTO);
+    void updateSchedule(Long id, InterviewScheduleDTO scheduleDTO);
     void deleteSchedule(Long id);
 }

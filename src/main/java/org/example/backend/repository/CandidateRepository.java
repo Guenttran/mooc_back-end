@@ -1,13 +1,13 @@
 package org.example.backend.repository;
 
-import org.example.backend.entity.Employee;
+import org.example.backend.entity.Candidate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+public interface CandidateRepository extends JpaRepository<Candidate, Long> {
 
-    Optional<Employee> getByUsername(String username);
+    Optional<Candidate> getByFullname(String fullname);
 }
