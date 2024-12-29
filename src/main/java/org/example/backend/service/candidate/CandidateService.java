@@ -1,13 +1,15 @@
 package org.example.backend.service.candidate;
 
 import org.example.backend.dto.employee.CandidateDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.IOException;
 
 public interface CandidateService {
-//    List<CandidateDTO> getAllCandidates();
 
+    void save(CandidateDTO candidateDTO, MultipartFile cv);
 
+    void update(Long id, CandidateDTO candidateDTO, MultipartFile cv);
+
+    void saveWithCv(CandidateDTO candidateDTO, MultipartFile cv) throws IOException;
 }

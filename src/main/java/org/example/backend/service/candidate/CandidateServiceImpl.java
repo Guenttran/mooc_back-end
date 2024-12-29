@@ -2,15 +2,15 @@ package org.example.backend.service.candidate;
 
 import lombok.RequiredArgsConstructor;
 import org.example.backend.dto.employee.CandidateDTO;
+import org.example.backend.entity.Candidate;
 import org.example.backend.repository.CandidateRepository;
+import org.example.backend.utils.pdf.PdfUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +18,34 @@ import java.util.stream.Collectors;
 public class CandidateServiceImpl implements CandidateService {
     private final CandidateRepository candidateRepository;
 
-//    @Override
-//    public List<CandidateDTO> getAllCandidates() {
-//        return candidateRepository.findAll().stream().map(c -> {
-//            CandidateDTO dto = new CandidateDTO();
-//            BeanUtils.copyProperties(c, dto);
-//            return dto;
-//        }).collect(Collectors.toList());
-//    }
+    public void save(CandidateDTO candidateDTO, MultipartFile cv) {
+        Candidate candidate = new Candidate();
+        BeanUtils.copyProperties(candidateDTO, candidate);
+        candidateRepository.save(candidate);
+    }
 
+    
+    public void update(Long id, CandidateDTO candidateDTO, MultipartFile cv) {
+        Candidate candidate = candidateRepository.findById(id).orElseThrow();
+        BeanUtils.copyProperties(candidateDTO, candidate);
+        candidateRepository.save(candidate);
+    }
+
+    @Override
+    public void saveWithCv(CandidateDTO candidateDTO, MultipartFile cv) throws IOException {
+        if (cv.isEmpty()) {
+            throw new IllegalArgumentException("CV file is required.");
+        }
+        if (!cv.getContentType().equals("application/pdf")) {
+            throw new IllegalArgumentException("Invalid CV file type! Only PDF files are allowed.");
+        }
+
+        String cvContent = PdfUtils.extractTextFromPdf(cv);
+        Candidate candidate = new Candidate();
+        BeanUtils.copyProperties(candidateDTO, candidate);
+        candidate.setCv(cvContent);
+        candidateRepository.save(candidate);
+
+
+    }
 }
