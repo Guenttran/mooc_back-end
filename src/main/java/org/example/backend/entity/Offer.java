@@ -30,6 +30,8 @@ public class Offer extends BaseEntity {
 
     private String status;
 
+    private String position;
+
     private String note;
 
     @OneToOne(fetch = FetchType.LAZY)

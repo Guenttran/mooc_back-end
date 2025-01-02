@@ -88,4 +88,17 @@ public class OfferServiceImpl implements OfferService {
                 .orElseThrow(() -> new EntityNotFoundException("Register not found"));
     }
 
+    public OfferResponseDTO getOfferById(Long id) {
+        Offer offer = offerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Offer not found"));
+        OfferResponseDTO offerDTO = new OfferResponseDTO();
+        BeanUtils.copyProperties(offer, offerDTO);
+        offerDTO.setCandidateName(offer.getRegister().getCandidate().getFullname());
+        offerDTO.setLevel(String.valueOf(offer.getRegister().getJob().getLevel()));
+        offerDTO.setDepartment(offer.getRegister().getJob().getEmployee().getDepartment().getName());
+        offerDTO.setRecruiter(offer.getRegister().getCandidate().getRecruiter().getUsername());
+        offerDTO.setApprove(offer.getApprove().getFirstName() + " " + offer.getApprove().getLastName());
+        offerDTO.setInterviewTitle(offer.getRegister().getInterviewSchedule().getScheduleTitle());
+        return offerDTO;
+    }
 }

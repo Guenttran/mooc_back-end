@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/offers")
+@RequestMapping("/offers")
 @CrossOrigin("*")
 @AllArgsConstructor
 public class OfferController {
@@ -50,6 +50,12 @@ public class OfferController {
         }
         offerService.createOffer(offer);
         return ResponseEntity.ok().body("Offer created successfully!");
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OfferResponseDTO> getOfferById(@PathVariable Long id) {
+        OfferResponseDTO offer = offerService.getOfferById(id);
+        return ResponseEntity.ok(offer);
     }
 
     @PutMapping("/{id}")

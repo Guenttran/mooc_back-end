@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/schedules")
+@RequestMapping("/schedules")
 @CrossOrigin("*")
 @AllArgsConstructor
 public class ScheduleController {
