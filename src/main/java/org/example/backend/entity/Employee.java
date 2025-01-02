@@ -42,4 +42,7 @@ public class Employee extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @OneToMany(mappedBy = "approve")
+    private List<Offer> offers;
 }

@@ -25,4 +25,5 @@ public class CandidateSkill extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
+
 }

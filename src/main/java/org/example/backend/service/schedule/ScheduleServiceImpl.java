@@ -37,6 +37,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
+    public Page<InterviewScheduleDTO> getSchedulesByEmployee(Long employeeId, Pageable pageable) {
+        Page<InterviewSchedule> schedules = scheduleRepository.findAllByEmployeeId(employeeId, pageable);
+        return schedules.map(this::convertToDTO);
+    }
+
+    @Override
     public void createSchedule(InterviewScheduleDTO scheduleDTO) {
         InterviewSchedule schedule = new InterviewSchedule();
         Register register = dataEdit(scheduleDTO);
@@ -71,13 +77,17 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (!scheduleRepository.existsById(id)) {
             throw new EntityNotFoundException("Schedule not found");
         }
+        if (!registerRepository.existsByInterviewSchedule_ScheduleId(id)) {
+            throw new EntityNotFoundException("Register not found");
+        }
         scheduleRepository.deleteById(id);
+        registerRepository.deleteByInterviewSchedule_ScheduleId(id);
     }
 
     public InterviewScheduleDTO convertToDTO(InterviewSchedule schedule) {
         InterviewScheduleDTO dto = new InterviewScheduleDTO();
         BeanUtils.copyProperties(schedule, dto);
-        dto.setInterviewer(schedule.getRegister().getJob().getEmployee().getLastName());
+        dto.setInterviewer(schedule.getRegister().getJob().getEmployee().getUsername());
         dto.setRecruiter(schedule.getRegister().getCandidate().getRecruiter().getUsername());
         dto.setCandidateName(schedule.getRegister().getCandidate().getFullname());
         dto.setJob(schedule.getRegister().getJob().getJobName());

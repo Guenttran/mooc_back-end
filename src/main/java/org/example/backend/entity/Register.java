@@ -29,4 +29,7 @@ public class Register extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     private InterviewSchedule interviewSchedule;
+
+    @OneToOne(mappedBy = "register", orphanRemoval = true)
+    private Offer offer;
 }

@@ -14,4 +14,8 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
     Optional<Register> findByCandidateFullNameAndJobName(String candidateName, String job);
 
     Optional<Register> getByInterviewSchedule(InterviewSchedule schedule);
+
+    boolean existsByInterviewSchedule_ScheduleId(Long interviewScheduleScheduleId);
+
+    void deleteByInterviewSchedule_ScheduleId(Long id);
 }

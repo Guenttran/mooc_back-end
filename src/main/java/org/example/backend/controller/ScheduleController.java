@@ -1,8 +1,12 @@
 package org.example.backend.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.example.backend.dto.job.JobInterviewDTO;
 import org.example.backend.dto.schedule.InterviewScheduleDTO;
+import org.example.backend.entity.Candidate;
+import org.example.backend.entity.InterviewSchedule;
+import org.example.backend.repository.CandidateRepository;
 import org.example.backend.service.job.JobServiceImpl;
 import org.example.backend.service.schedule.ScheduleServiceImpl;
 import org.springframework.data.domain.Page;
@@ -24,6 +28,7 @@ import java.util.Map;
 public class ScheduleController {
     private final ScheduleServiceImpl scheduleService;
     private final JobServiceImpl jobService;
+    private final CandidateRepository candidateRepository;
 
     @GetMapping
     public Page<InterviewScheduleDTO> getAllSchedules(
@@ -41,7 +46,22 @@ public class ScheduleController {
         return ResponseEntity.ok(schedule);
     }
 
-    @GetMapping("/schedules/form-data")
+    @GetMapping("/create/{id}")
+    public ResponseEntity<Map<String, Object>> getCreateFormData(@PathVariable Long id) {
+        Candidate candidate = candidateRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Candidate not found"));
+
+        List<JobInterviewDTO> jobs = jobService.getAllOpenJobs();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("candidateName", candidate.getFullname());
+        response.put("jobs", jobs);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/add")
     public ResponseEntity<Map<String, Object>> getAddFormData() {
         List<JobInterviewDTO> jobs = jobService.getAllOpenJobs();
         Map<String, Object> response = new HashMap<>();
@@ -58,7 +78,7 @@ public class ScheduleController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/schedules/{id}/form-data")
+    @GetMapping("/schedules/{id}/details")
     public ResponseEntity<Map<String, Object>> getUpdateFormData(@PathVariable Long id) {
         InterviewScheduleDTO scheduleDTO = scheduleService.getScheduleById(id);
         List<JobInterviewDTO> jobs = jobService.getAllOpenJobs();
@@ -82,8 +102,7 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {
+    public void deleteSchedule(@PathVariable Long id) {
         scheduleService.deleteSchedule(id);
-        return ResponseEntity.noContent().build();
     }
 }
